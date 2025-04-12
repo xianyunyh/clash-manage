@@ -1,5 +1,6 @@
 import { Context, Next } from 'hono'
 import { Env } from '../bindings'
+import ErrorPage from '../view/ErrorPage'
 
 /**
  * HTTP Basic Auth 中间件
@@ -17,9 +18,13 @@ export async function basicAuth(c: Context<{ Bindings: Env }>, next: Next) {
     '/health',
     '/favicon.ico',
     '/clash/', // 所有 clash 订阅链接都允许免验证访问
-    '/', // 登录页面
-    '/login' // 登录处理路由
+    '/login', // 登录页面
+    '/403',   // 403错误页面
+    '/404'    // 404错误页面
   ]
+  if (c.req.path === '/') {
+    return next()
+  }
 
   // 检查请求路径是否在白名单中
   if (publicPaths.some(path => c.req.path.startsWith(path))) {
@@ -29,11 +34,18 @@ export async function basicAuth(c: Context<{ Bindings: Env }>, next: Next) {
   // 获取 Authorization 请求头
   const authHeader = c.req.header('Authorization')
 
-  // 如果没有提供 Authorization 头，返回 401 未授权
+  // 如果没有提供 Authorization 头，返回 403 禁止访问的错误页面
   if (!authHeader || !authHeader.startsWith('Basic ')) {
-    return c.text('需要登录才能访问', 401, {
-      'WWW-Authenticate': 'Basic realm="Clash 配置管理系统", charset="UTF-8"'
-    })
+
+    return c.html(
+      <ErrorPage 
+        statusCode={403}
+        title="访问被拒绝"
+        message="您需要登录才能访问此页面。请输入有效的用户名和密码。"
+        backUrl="/login"
+        backText="前往登录"
+      />
+    , 401)
   }
 
   // 解析 Basic Auth 凭证
@@ -54,10 +66,16 @@ export async function basicAuth(c: Context<{ Bindings: Env }>, next: Next) {
     console.error('Basic Auth 解析错误:', error)
   }
 
-  // 身份验证失败，返回 401 未授权
-  return c.text('用户名或密码错误', 401, {
-    'WWW-Authenticate': 'Basic realm="Clash 配置管理系统", charset="UTF-8"'
-  })
+  // 身份验证失败，返回 403 禁止访问的错误页面
+  return c.html(
+    <ErrorPage 
+      statusCode={403}
+      title="认证失败"
+      message="用户名或密码错误。请检查您的凭据并重试。"
+      backUrl="/login"
+      backText="重新登录"
+    />
+  , 401)
 }
 
 /**

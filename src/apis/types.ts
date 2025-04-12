@@ -14,7 +14,7 @@ export interface Rule {
   type: string
   content: string
   policy: string
-  createdAt: string
+
 }
 
 // 节点相关接口
@@ -47,4 +47,41 @@ export function isValidUrl(url: string): boolean {
   } catch {
     return false
   }
+}
+
+
+// Clash Config 相关接口
+export interface ClashConfig {
+  port?: number
+  proxies?: ProxyConfig[]
+  ['proxy-groups']?: ProxyGroup[]
+  rules?: string[]
+  dns?: DnsConfig
+}
+
+export interface ProxyConfig {
+  name: string
+  type: string
+  server: string
+  port: number
+  password?: string
+  uuid?: string
+  cipher?: string
+  udp?: boolean
+  tls?: boolean
+}
+
+export interface ProxyGroup {
+  name: string
+  type: 'select' | 'url-test' | 'fallback' | 'load-balance'
+  proxies: string[]
+  url?: string
+  interval?: number
+}
+
+export interface DnsConfig {
+  enable: boolean
+  listen?: string
+  nameserver?: string[]
+  fallback?: string[]
 }
