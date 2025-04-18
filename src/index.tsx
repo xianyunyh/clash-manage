@@ -1,24 +1,20 @@
 import { Hono } from 'hono'
-import Layout from './view/Layout'
-import ChangePasswordForm from './view/ChangePassword'
 import ErrorPage from './view/ErrorPage'
 import { Env } from './bindings'
 import {getDeleteSubscriptionView, getEditSubscriptionView, getSubscriptionListHandler, postAddSubscriptionHandler, postDeleteSubscriptionHandler, postEditSubscriptionHandler } from './apis/subscriptions'
 import { basicAuth } from './middleware/auth'
 import {
-  Login as LoginPage, AddSubscriptionForm,
+  AddSubscriptionForm,
+  Layout,
 } from './view'
-import { UserChangePwd, UserLogin } from './apis/user'
 import { addRuleView, deleteRuleView, postAddRuleHandler, postDeleteRuleHandler } from './apis/rule'
 import { generateConfig } from './apis/config'
 import { addNodeView, deleteNode, deleteNodeView, editNodeView, nodeListView, postAddNode, postEditNode } from './apis/node'
-import Home from './view/Home'
 const app = new Hono<{ Bindings: Env }>()
 
 // 应用 Basic Auth 中间件到所有路由
 app.use('*', basicAuth)
 
-// app.get('/',(c) => c.html(<Home />))
 // 403 禁止访问页面
 app.get('/403', (c) => {
   return c.html(
@@ -52,13 +48,8 @@ app.notFound((c) => {
   )
 })
 
-// 将首页设置为登录页面
-app.get('/', (c) => c.html(<LoginPage />))
-app.get('/login', (c) => c.html(<LoginPage />))
-// 处理登录请求
-app.post('/login', UserLogin)
-
 // 将原首页功能添加到仪表盘路由
+app.get('/', (c) => c.redirect('/subscriptions', 301))
 app.get('/subscriptions', getSubscriptionListHandler)
 
 app.get('/subscription/add', (c) => {
@@ -119,12 +110,6 @@ app.get('/subscription/:subId/node/:nodeId/delete', deleteNodeView)
 
 // 处理删除节点请求
 app.post('/subscription/:subId/node/:nodeId/delete', deleteNode)
-
-// 修改密码页面
-app.get('/admin/change-password', (c) => {
-  return c.html(<ChangePasswordForm />)
-})
-// 处理修改密码请求
-app.post('/admin/change-password', UserChangePwd)
-
-export default app
+export default {
+  fetch: app.fetch
+}

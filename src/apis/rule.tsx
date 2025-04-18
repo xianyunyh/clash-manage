@@ -8,7 +8,7 @@ export async function addRuleView(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -42,7 +42,7 @@ export async function getAddRuleHandler(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -76,7 +76,7 @@ export async function postAddRuleHandler(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -123,7 +123,7 @@ export async function postAddRuleHandler(c: Context<{ Bindings: Env }>) {
     subData.rules.push(newRule)
 
     // 更新订阅数据
-    await c.env.CLASH_SUBS.put(id, JSON.stringify(subData))
+    await c.env.CLASH_CONFIG_KV.put(id, JSON.stringify(subData))
 
     return c.html(
       <Layout>
@@ -184,7 +184,7 @@ export async function deleteRuleView(c: Context<{ Bindings: Env }>) {
     const ruleId = c.req.param('ruleId')
     try {
       // 从 KV 中获取订阅信息
-      const subscription = await c.env.CLASH_SUBS.get(subId)
+      const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
       if (!subscription) {
         return c.html(
@@ -290,7 +290,7 @@ export async function getDeleteRuleHandler(c: Context<{ Bindings: Env }>) {
   const ruleId = c.req.param('ruleId')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(subId)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
     if (!subscription) {
       return c.html(
@@ -396,7 +396,7 @@ export async function postDeleteRuleHandler(c: Context<{ Bindings: Env }>) {
   const ruleId = c.req.param('ruleId')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(subId)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
     if (!subscription) {
       return c.html(
@@ -426,7 +426,7 @@ export async function postDeleteRuleHandler(c: Context<{ Bindings: Env }>) {
     subData.rules = subData.rules.filter(rule => rule.id !== ruleId)
 
     // 更新订阅数据
-    await c.env.CLASH_SUBS.put(subId, JSON.stringify(subData))
+    await c.env.CLASH_CONFIG_KV.put(subId, JSON.stringify(subData))
 
     return c.html(
       <Layout>

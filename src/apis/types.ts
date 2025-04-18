@@ -53,8 +53,19 @@ export function isValidUrl(url: string): boolean {
 // Clash Config 相关接口
 export interface ClashConfig {
   port?: number
+  mode?: string
+  log_level?: string
+  allow_lan?: boolean
+  external_controller?: string
+  secret?: string
+  external_ui?: string
+  mixed_port?: number
+  bind_addr?: string
+  ipv6?: boolean
+  redir_port?: number
   proxies?: ProxyConfig[]
   ['proxy-groups']?: ProxyGroup[]
+  ['rule-providers']?: Record<string, RuleProvider>
   rules?: string[]
   dns?: DnsConfig
 }
@@ -84,4 +95,12 @@ export interface DnsConfig {
   listen?: string
   nameserver?: string[]
   fallback?: string[]
+}
+
+export interface RuleProvider {
+  type: string
+  behavior: string
+  url?: string
+  path?: string
+  interval?: number
 }

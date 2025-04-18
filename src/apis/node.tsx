@@ -7,7 +7,7 @@ export async function nodeListView(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -44,7 +44,7 @@ export async function postAddNode(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -131,7 +131,7 @@ export async function postAddNode(c: Context<{ Bindings: Env }>) {
     subData.nodes.push(newNode)
 
     // 更新订阅数据
-    await c.env.CLASH_SUBS.put(id, JSON.stringify(subData))
+    await c.env.CLASH_CONFIG_KV.put(id, JSON.stringify(subData))
 
     return c.html(
       <Layout>
@@ -191,7 +191,7 @@ export async function addNodeView(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -226,7 +226,7 @@ export async function editNodeView(c: Context<{ Bindings: Env }>) {
 
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(subId)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
     if (!subscription) {
       return c.html(
@@ -294,7 +294,7 @@ export async function postEditNode(c: Context<{ Bindings: Env }>) {
 
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(subId)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
     if (!subscription) {
       return c.html(
@@ -407,7 +407,7 @@ export async function postEditNode(c: Context<{ Bindings: Env }>) {
     subData.nodes[nodeIndex] = updatedNode
 
     // 更新订阅数据
-    await c.env.CLASH_SUBS.put(subId, JSON.stringify(subData))
+    await c.env.CLASH_CONFIG_KV.put(subId, JSON.stringify(subData))
 
     return c.html(
       <Layout>
@@ -469,7 +469,7 @@ export async function deleteNodeView(c: Context<{ Bindings: Env }>) {
 
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(subId)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
     if (!subscription) {
       return c.html(
@@ -576,7 +576,7 @@ export async function deleteNode(c: Context<{ Bindings: Env }>) {
 
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(subId)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(subId)
 
     if (!subscription) {
       return c.html(
@@ -606,7 +606,7 @@ export async function deleteNode(c: Context<{ Bindings: Env }>) {
     subData.nodes = subData.nodes.filter(node => node.id !== nodeId)
 
     // 更新订阅数据
-    await c.env.CLASH_SUBS.put(subId, JSON.stringify(subData))
+    await c.env.CLASH_CONFIG_KV.put(subId, JSON.stringify(subData))
 
     return c.html(
       <Layout>

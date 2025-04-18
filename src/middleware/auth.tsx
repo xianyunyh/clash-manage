@@ -45,7 +45,10 @@ export async function basicAuth(c: Context<{ Bindings: Env }>, next: Next) {
         backUrl="/login"
         backText="前往登录"
       />
-    , 401)
+    , 401,{
+        'WWW-Authenticate': 'Basic realm="Secure Area"',
+        'Content-Type': 'text/html; charset=utf-8'
+    })
   }
 
   // 解析 Basic Auth 凭证
@@ -89,8 +92,8 @@ export async function verifyCredentials(c: Context<{ Bindings: Env }>, username:
   
   try {
     // 尝试从 KV 存储中获取用户名和密码
-    const kvUsername = await c.env.CLASH_SUBS.get('AUTH_USERNAME')
-    const kvPassword = await c.env.CLASH_SUBS.get('AUTH_PASSWORD')
+    const kvUsername = await c.env.CLASH_CONFIG_KV.get('AUTH_USERNAME')
+    const kvPassword = await c.env.CLASH_CONFIG_KV.get('AUTH_PASSWORD')
     
     // 如果 KV 中有存储的用户名和密码，优先使用
     const correctUsername = kvUsername || storedUsername
@@ -116,8 +119,8 @@ export async function updateAuthCredentials(c: Context<{ Bindings: Env }>, usern
   
   // 示例实现（假设使用 KV 存储）
   try {
-    await c.env.CLASH_SUBS.put('AUTH_USERNAME', username)
-    await c.env.CLASH_SUBS.put('AUTH_PASSWORD', password)
+    await c.env.CLASH_CONFIG_KV.put('AUTH_USERNAME', username)
+    await c.env.CLASH_CONFIG_KV.put('AUTH_PASSWORD', password)
     return true
   } catch (error) {
     console.error('更新认证凭据出错:', error)

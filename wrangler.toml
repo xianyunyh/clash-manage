@@ -1,25 +1,17 @@
 name = "clash-config"
 main = "src/index.tsx"
-compatibility_date = "2025-04-12"
-
-# KV 命名空间配置
-[[kv_namespaces]]
-binding = "CLASH_SUBS"
-id = "your-kv-id-in-production" # 将在实际部署时替换为生产环境的 KV ID
-preview_id = "your-preview-kv-id" # 将在实际预览时替换为预览环境的 KV ID
-
-# 环境配置
-[env.development]
+compatibility_date = "2025-04-09"
+[vars]
 AUTH_USERNAME="admin" # 开发环境的用户名
 AUTH_PASSWORD="admin" # 开发环境的密码
-# 开发环境 KV 配置
-[[env.development.kv_namespaces]]
-binding = "CLASH_SUBS"
-id = "development-kv-id" # 开发环境的 KV ID
-
-[env.production]
-# 生产环境配置
-
+[[env.dev.vars]]
+AUTH_USERNAME="admin" # 预览环境的用户名
+AUTH_PASSWORD="admin" # 预览环境的密码
+[[env.preview.vars]]
+# KV 命名空间配置
+[[kv_namespaces]]
+binding = "CLASH_CONFIG_KV"
+id = "ed1628e6ab6743eab57628db7f109576" # 将在实际部署时替换为生产环境的 KV ID
 # 开发服务器配置
 [dev]
 port = 8787

@@ -9,7 +9,7 @@ import EditSubscriptionForm from '../view/EditSubscriptionForm'
 // 订阅列表页面
 export async function getSubscriptionListHandler(c: Context<{ Bindings: Env }>) {
   try {
-    const subscriptionsList = await fetchSubscriptions(c.env.CLASH_SUBS) || []
+    const subscriptionsList = await fetchSubscriptions(c.env.CLASH_CONFIG_KV) || []
     return c.html(<SubscriptionList subscriptions={subscriptionsList} />)
   } catch (error) {
     console.error('获取订阅列表出错:', error)
@@ -37,7 +37,7 @@ export async function getEditSubscriptionView(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -92,7 +92,7 @@ export async function postAddSubscriptionHandler(c: Context<{ Bindings: Env }>) 
     const id = crypto.randomUUID()
 
     // 存储订阅信息到KV中
-    await c.env.CLASH_SUBS.put(id, JSON.stringify({
+    await c.env.CLASH_CONFIG_KV.put(id, JSON.stringify({
       url: subUrl,
       name: name,
       createdAt: new Date().toISOString(),
@@ -149,7 +149,7 @@ export async function getDeleteSubscriptionView(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -212,7 +212,7 @@ export async function getDeleteSubscriptionHandler(c: Context<{ Bindings: Env }>
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -275,7 +275,7 @@ export async function getDeleteSubscriptionHandler(c: Context<{ Bindings: Env }>
 export async function postDeleteSubscriptionHandler(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   try {
-    await c.env.CLASH_SUBS.delete(id)
+    await c.env.CLASH_CONFIG_KV.delete(id)
     return c.html(
       <Layout>
         <div style={{ color: 'green', marginBottom: '15px', padding: '10px', background: '#e8f5e9', borderRadius: '4px' }}>
@@ -314,7 +314,7 @@ export async function getEditSubscriptionHandler(c: Context<{ Bindings: Env }>) 
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -352,7 +352,7 @@ export async function postEditSubscriptionHandler(c: Context<{ Bindings: Env }>)
   const id = c.req.param('id')
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.html(
@@ -400,7 +400,7 @@ export async function postEditSubscriptionHandler(c: Context<{ Bindings: Env }>)
     subData.name = name
 
     // 保存到 KV
-    await c.env.CLASH_SUBS.put(id, JSON.stringify(subData))
+    await c.env.CLASH_CONFIG_KV.put(id, JSON.stringify(subData))
 
     return c.html(
       <Layout>
@@ -462,7 +462,7 @@ export async function getClashConfigHandler(c: Context<{ Bindings: Env }>) {
 
   try {
     // 从 KV 中获取订阅信息
-    const subscription = await c.env.CLASH_SUBS.get(id)
+    const subscription = await c.env.CLASH_CONFIG_KV.get(id)
 
     if (!subscription) {
       return c.text('订阅不存在或已被删除', 404)
