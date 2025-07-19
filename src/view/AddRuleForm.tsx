@@ -77,7 +77,7 @@ const AddRuleForm: FC<{
           >
             <option value="DIRECT">DIRECT（直连）</option>
             <option value="REJECT">REJECT（拒绝）</option>
-            <option value="PROXY">PROXY（代理）</option>
+            <option value="Proxy">PROXY（代理）</option>
           </select>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
