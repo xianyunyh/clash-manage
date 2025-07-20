@@ -3,12 +3,19 @@ import yaml from 'js-yaml'
 
 // 辅助函数：应用自定义规则到配置中
 function applyCustomRules(originalConfig: ClashConfig, rules: Rule[], nodes: Node[]): ClashConfig {
-  if (rules.length === 0) return originalConfig
   const originRules = originalConfig.rules || []
-  const newRules = rules.map(rule => {
+  const newRules = (rules || []).map(rule => {
     return `${rule.type},${rule.content},${rule.policy}` // 规则格式化   
   })
-  originalConfig.rules = [...newRules, ...originRules]
+  
+  const nodeNames = originalConfig.proxies?.map(node => node.name) || []
+  const groupNames = originalConfig['proxy-groups']?.map(group => group.name) || []
+  const sets = Object.keys(originalConfig['rule-providers'] || {})
+  const providers = nodeNames.concat(groupNames).concat(sets)
+  originalConfig.rules = [...newRules, ...originRules].filter((rule) => {
+    const name = rule.split(',')[2]
+    return providers.includes(name) || name === 'DIRECT' || name === 'REJECT'
+  });
   return originalConfig
 }
 
@@ -177,6 +184,12 @@ function extraRuleProvider(): {
     providers,
     rules: ruleSets
   }
+}
+function extraRules(){
+  return [
+    'DOMAIN-SUFFIX,local,DIRECT',
+    'IP-CIDR'
+  ]
 }
 
 export {
