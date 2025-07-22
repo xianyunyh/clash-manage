@@ -8,6 +8,7 @@ export async function generateConfig(c: Context<{ Bindings: Env }>) {
   const id = c.req.param('id')
   const auto = !!c.req.query('auto')
   const extend = !!c.req.query('extend')
+  const raw = !!c.req.query('raw')
   try {
     // 从 KV 中获取订阅信息
     const subscription = await c.env.CLASH_CONFIG_KV.get(id)
@@ -27,6 +28,13 @@ export async function generateConfig(c: Context<{ Bindings: Env }>) {
     // 获取订阅内容
     const content = await response.text()
     let originalConfig = yaml.load(content) as ClashConfig
+    if (raw) {
+      // 如果是原始订阅，直接返回
+      return c.text(content, 200, {
+        'Content-Type': 'text/yaml; charset=utf-8',
+        "subscription-userinfo": headers.get('subscription-userinfo') || '',
+      })
+    }
     if (auto) {
       // 然后按国家/地区对节点进行分组
       originalConfig["proxy-groups"] = groupNodesByCountry(originalConfig);

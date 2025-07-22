@@ -7,16 +7,24 @@ function applyCustomRules(originalConfig: ClashConfig, rules: Rule[], nodes: Nod
   const newRules = (rules || []).map(rule => {
     return `${rule.type},${rule.content},${rule.policy}` // 规则格式化   
   })
-  
-  const nodeNames = originalConfig.proxies?.map(node => node.name) || []
-  const groupNames = originalConfig['proxy-groups']?.map(group => group.name) || []
-  const sets = Object.keys(originalConfig['rule-providers'] || {})
-  const providers = nodeNames.concat(groupNames).concat(sets)
-  originalConfig.rules = [...newRules, ...originRules].filter((rule) => {
-    const name = rule.split(',')[2]
-    return providers.includes(name) || name === 'DIRECT' || name === 'REJECT'
+  originalConfig.rules = [...newRules, ...originRules]
+  return filterRule(originalConfig)
+}
+export function filterRule(config: ClashConfig): ClashConfig {
+  const nodeNames = config.proxies?.map((node) => node.name) || [];
+  const groupNames = config["proxy-groups"]?.map((group) => group.name) || [];
+  const sets = Object.keys(config["rule-providers"] || {});
+  const providers = nodeNames.concat(groupNames).concat(sets);
+  const presetRules = defaultRules()
+  let rules = (config.rules || []).concat(presetRules)
+  // 过滤重复规则
+  rules = Array.from(new Set(rules));
+  config.rules = rules.filter((rule) => {
+    const temp = rule.split(",");
+    const name = temp[temp.length - 1];
+    return providers.includes(name) || name === "DIRECT" || name === "REJECT";
   });
-  return originalConfig
+  return config;
 }
 
 /**
@@ -35,7 +43,17 @@ function groupNodesByCountry(originalConfig: ClashConfig): Array<ProxyGroup> {
     '🇯🇵🇰🇷日韩': ['日本', 'JP', 'Japan', '韩国', '南韩', 'KR', 'Korea'],
     '🇸🇬新加坡': ['新加坡', 'SG', 'Singapore'],
     '🇺🇸美国': ['美国', 'US', 'USA', 'United States'],
-    '🇪🇺欧洲': ['英国', 'UK', 'GB', 'Great Britain', 'United Kingdom', '德国', 'DE', 'Germany', '法国', 'FR', 'France'],
+    '🇪🇺欧洲': [
+      '英国', 'UK', 'GB', 'Great Britain', 'United Kingdom', 
+      '德国', 'DE', 'Germany',
+      '法国', 'FR', 'France',
+      '瑞士', 'CH', 'Switzerland',
+      '意大利', 'IT', 'Italy',
+      '西班牙', 'ES', 'Spain',
+      '荷兰', 'NL', 'Netherlands',
+      '比利时', 'BE', 'Belgium',
+      '瑞典', 'SE', 'Sweden',
+    ]
   }
   
   // 按国家/地区分组节点
@@ -133,6 +151,20 @@ function groupNodesByCountry(originalConfig: ClashConfig): Array<ProxyGroup> {
   newGroups.unshift(selectGroup)
   return newGroups
 }
+function defaultRules(): string[] {
+  return  [
+    "DOMAIN-SUFFIX,local,DIRECT",
+    "IP-CIDR,192.168.0.0/16,DIRECT",
+    "IP-CIDR,10.0.0.0/8,DIRECT",
+    "IP-CIDR,172.16.0.0/12,DIRECT",
+    "IP-CIDR,127.0.0.0/8,DIRECT",
+    "IP-CIDR,::1/128,DIRECT",
+
+    "GEOIP,CN,DIRECT",
+    "GEOIP,LAN,DIRECT",
+    "MATCH,Proxy",
+  ];
+}
 function extraRuleProvider(): {
   providers: Record<string, RuleProvider>
   rules: string[]
@@ -160,8 +192,6 @@ function extraRuleProvider(): {
     interval: 86400
   }
   const ruleSets = [
-    'DOMAIN-SUFFIX,local,DIRECT',
-
     "DOMAIN-SUFFIX,google.com,Proxy",
     "DOMAIN-SUFFIX,youtube.com,Proxy",
     "DOMAIN,clash.razord.top,DIRECT",
@@ -169,27 +199,12 @@ function extraRuleProvider(): {
     'RULE-SET,Cncidr,DIRECT',
     'RULE-SET,GFW,Proxy',
 
-    'DOMAIN-SUFFIX,local,DIRECT',
-    'IP-CIDR,192.168.0.0/16,DIRECT',
-    'IP-CIDR,10.0.0.0/8,DIRECT',
-    'IP-CIDR,172.16.0.0/12,DIRECT',
-    'IP-CIDR,127.0.0.0/8,DIRECT',
-    'IP-CIDR,::1/128,DIRECT',
-
-    "GEOIP,CN,DIRECT",
-    "GEOIP,LAN,DIRECT",
-    "MATCH,Proxy",
+    ...defaultRules(),
   ]
   return {
     providers,
     rules: ruleSets
   }
-}
-function extraRules(){
-  return [
-    'DOMAIN-SUFFIX,local,DIRECT',
-    'IP-CIDR'
-  ]
 }
 
 export {
