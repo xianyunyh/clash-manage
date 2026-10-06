@@ -543,7 +543,12 @@ export async function getClashConfigHandler(c: Context<{ Bindings: Env }>) {
     const subData = JSON.parse(subscription) as Subscription;
 
     // 获取原始订阅内容
-    const response = await fetch(subData.url);
+    const response = await fetch(subData.url, {
+      method: "GET",
+      headers: {
+        "User-Agent": "clash-verge/v2.4.7",
+      },
+    });
     if (!response.ok) {
       return c.text("获取原始订阅失败", 500);
     }
